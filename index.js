@@ -1,4 +1,7 @@
 var BasePlugin = require('ember-cli-deploy-plugin');
+var RsyncDeploy = require('./lib/rsync-deploy');
+var fs         = require('fs');
+var path       = require('path');
 
 module.exports = {
   name: 'ember-cli-deploy-ssh',
@@ -7,24 +10,70 @@ module.exports = {
     var DeployPlugin = BasePlugin.extend({
       name: options.name,
 
-      defaultConfig: {
-        filePattern: '**/*.{js,css,png}' // default filePattern if it isn't defined in config/dpeloy.js
-      },
-
       requiredConfig: ['username', 'host', 'remoteDir', 'privateKeyFile'],
 
-      didBuild: function(context) {
-        //do something amazing here once the project has been built
+      /**
+       * @typedef {Object} Config
+       * @param {String} username
+       * @param {String} host
+       * @param {String} privateKeyFile
+       * @param {String} remoteDir
+       * @param {Number} [port=22]
+       * @param {Boolean} [progress=false]
+       * @param {Boolean} [debug=false]
+       * @param {String} [distDir] - by default, returned from ember-cli-deploy-build
+       * @param {String} [revisionKey] - by default, returned from ember-cli-deploy-build
+       */
+      defaultConfig: {
+        username: null,
+        host: null,
+        port: 22,
+        privateKeyFile: null,
+        remoteDir: null,
+        progress: false,
+        debug: false,
+        filePattern: '**/*',
+        distDir: function(context) {
+          return context.distDir;
+        },
+        revisionKey: function(context) {
+          var revisionKey = context.revisionData && context.revisionData.revisionKey;
+          return context.commandOptions.revision || revisionKey;
+        },
       },
 
       upload: function(context) {
-        this.log('Uploading assets');
-        //do something here to actually deploy your app somewhere
-      },
+        var self = this;
 
-      didDeploy: function(context) {
-        //do something here like notify your team on slack
+        var rsync_config = {
+            host: this.readConfig('host'),
+            username: this.readConfig('username'),
+            port: this.readConfig('port'),
+            remoteDir: this.readConfig('remoteDir'),
+            privateKeyFile: this.readConfig('privateKeyFile'),
+            distDir: this.readConfig('distDir'),
+            revisionKey: this.readConfig('revisionKey'),
+            progress: this.readConfig('progress'),
+            debug: this.readConfig('debug')
+          };
+
+        rsync_config.privateKey = fs.readFileSync(rsync_config.privateKeyFile);
+        if (!rsync_config.privateKey) {
+          throw new Error(`Can't read ssh key, by path: ${rsync_config.privateKeyFile}`);
+        }
+
+        // 1. Resolve absolute path
+        // 2. Trailing slash with asterisk for copying content of directory
+        rsync_config.distDir = path.resolve(rsync_config.distDir) + '/*';
+        if (!rsync_config.distDir) {
+          throw new Error('Before, please install ember-cli-deploy-build. Or add it to package.json');
+        }
+
+        var rsyncDeploy = new RsyncDeploy({ plugin: this, config: rsync_config });
+        return rsyncDeploy.upload();
+
       }
+
     });
 
     return new DeployPlugin();
