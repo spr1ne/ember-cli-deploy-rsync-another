@@ -21,6 +21,7 @@ module.exports = {
        * @param {Number} [port=22]
        * @param {Boolean} [progress=false]
        * @param {Boolean} [debug=false]
+       * @param {Boolean} [index=true] - exclude index.html?
        * @param {String} [distDir] - by default, returned from ember-cli-deploy-build
        * @param {String} [revisionKey] - by default, returned from ember-cli-deploy-build
        */
@@ -32,6 +33,7 @@ module.exports = {
         remoteDir: null,
         progress: false,
         debug: false,
+        index: true,
         filePattern: '**/*',
         distDir: function(context) {
           return context.distDir;

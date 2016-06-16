@@ -1,4 +1,4 @@
-# Ember-cli-deploy-ssh
+# Ember-cli-deploy-rsync-another
 
 This README outlines the details of collaborating on this Ember addon.
 
@@ -8,10 +8,41 @@ This README outlines the details of collaborating on this Ember addon.
 * `npm install`
 * `bower install`
 
-## Running
+## Configuration
 
-* `ember server`
-* Visit your app at http://localhost:4200.
+```javascript
+/**
+ * @typedef {Object} Config
+ * @param {String} username
+ * @param {String} host
+ * @param {String} privateKeyFile
+ * @param {String} remoteDir
+ * @param {Number} [port=22]
+ * @param {Boolean} [progress=false]
+ * @param {Boolean} [debug=false]
+ * @param {Boolean} [index=true] - exclude index.html?
+ * @param {String} [distDir] - by default, returned from ember-cli-deploy-build
+ * @param {String} [revisionKey] - by default, returned from ember-cli-deploy-build
+ */
+defaultConfig: {
+  username: null,
+  host: null,
+  port: 22,
+  privateKeyFile: null,
+  remoteDir: null,
+  progress: false,
+  debug: false,
+  index: true,
+  filePattern: '**/*',
+  distDir: function(context) {
+    return context.distDir;
+  },
+  revisionKey: function(context) {
+    var revisionKey = context.revisionData && context.revisionData.revisionKey;
+    return context.commandOptions.revision || revisionKey;
+  },
+},
+```
 
 ## Running Tests
 
