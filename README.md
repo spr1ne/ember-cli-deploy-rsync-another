@@ -1,12 +1,37 @@
 # Ember-cli-deploy-rsync-another
 
-This README outlines the details of collaborating on this Ember addon.
+## Quick start
 
-## Installation
+* I use it with [ember-deploy-ssh-index](https://github.com/treyhunner/ember-deploy-ssh-index/)
+```javascript
+  // config/environment.js
+  ENV['ssh-index'] = {
+    allowOverwrite: true,
+    username: 'sweet-bob',
+    host: 'github-private',
+    remoteDir: '/var/www/test/', // Make sure you have enough rights
+    privateKeyFile: '~/.ssh/web'
+  };
+```
+* If you using multiple keys on one host, please config (or create) your ~/.ssh/config, for example
+```
+Host github-private
+  HostName github.com
+  Port 22
+  User sweet-bob
+  IdentityFile ~/.ssh/github-company
 
-* `git clone` this repository
-* `npm install`
-* `bower install`
+``` 
+* Config ssh
+```javascript
+  // config/environment.js
+  ENV['ssh'] = {
+    username: 'sweet-bob',
+    host: 'github-private',
+    remoteDir: '/var/www/test/', // Make sure you have enough rights
+    privateKeyFile: '~/.ssh/web',
+  };
+````
 
 ## Configuration
 
