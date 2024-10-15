@@ -2,7 +2,7 @@
 
 ## Quick start
 
-* I use it with forked version of ember-deploy-ssh-index (with new version ssh2 utility) [ember-deploy-ssh-index](https://github.com/spr1ne/ember-cli-deploy-ssh-index)
+* I use it **with forked version of ember-deploy-ssh-index** (with new version ssh2 utility) [ember-deploy-ssh-index](https://github.com/spr1ne/ember-cli-deploy-ssh-index)
 ```javascript
   // config/environment.js
   ENV['ssh-index'] = {
